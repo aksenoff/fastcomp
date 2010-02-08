@@ -26,66 +26,6 @@ Tree::Node* Tree::Node::createChild(const BYTE d, Tree *tree)
 	else return (right = new Tree::Node(d));
 };
 
-Tree::iterator::iterator(Tree *t, const BYTE d)
-	: tree(t), totalRightCount(tree->totalCount)
-{
-	if(tree->rootNode) node = tree->rootNode;
-	else 
-	{
-		node = tree->rootNode = new Node(d); // that's why we need 3rd parameter
-		newTree = true;
-		nodeAdded = true;
-		tree->numNodes++;
-	}
-	tree->totalCount++;
-};
-Tree::iterator::iterator(const iterator &it)
-	: node(it.node), totalRightCount(it.totalRightCount), totalLeftCount(it.totalLeftCount),
-	  tree(it.tree), selfCount(it.selfCount), oldLeftCount(it.oldLeftCount) {};
-Tree::iterator::~iterator() {};
-void Tree::iterator::operator[](const BYTE d)
-{
-	// at the beginning rightCount is Tree's totalCount
-	//static Node *next_node; // multithreading?
-	oldLeftCount = totalLeftCount = node->leftCount;
-	selfCount = node->selfCount;
-	totalRightCount -= selfCount + totalLeftCount;	
-	while(node->data != d)
-	{
-		if(node->data > d)
-		{
-			node->leftCount++;
-			if(node->left) 
-			{
-				node = node->left;
-				totalRightCount += selfCount + oldLeftCount - node->selfCount - node->leftCount;
-				totalLeftCount += node->leftCount - oldLeftCount;
-				selfCount = node->selfCount;
-				oldLeftCount = node->leftCount;
-			}
-			else {
-				node->createChild(d, tree);
-				escaped = true;
-				return;
-			}				
-		}
-		else if(node->right)
-			 {
-				 node = node->right;
-				 totalRightCount -= node->selfCount + node->leftCount;
-				 totalLeftCount += selfCount + node->leftCount;
-				 selfCount = node->selfCount;
-				 oldLeftCount = node->leftCount;
-		     }
-			 else {
-				 node->createChild(d, tree);
-				 escaped = true;
-				 return;
-			 }
-	}
-	node->selfCount++;
-};
-
 Tree *t;
 
 void initialize_model()
@@ -111,7 +51,7 @@ void encode_in_null_table(BYTE d, SYMBOL* s)
 	s->scale = 256;
 }
 
-bool get_symbol(BYTE d, SYMBOL* s)
+bool Tree::encode(BYTE d, SYMBOL* s)
 {
 	long escape_count = 0;
 	if(escaped || newTree)
@@ -120,20 +60,71 @@ bool get_symbol(BYTE d, SYMBOL* s)
 		encode_in_null_table(d, s);
 		return false;
 	}
-	//newTree = escaped = false;
-	Tree::iterator iter(t, d);
+	Node *node;
+	long totalRightCount;
+	long totalLeftCount;
+	long oldLeftCount;
+	long selfCount;
+	totalRightCount = totalCount;
+	if(rootNode) node = rootNode;
+	else 
+	{
+		node = rootNode = new Node(d); // that's why we need 3rd parameter
+		newTree = true;
+		nodeAdded = true;
+		numNodes++;
+	}
+	totalCount++;
 	if(!newTree) {
-		iter[d];
+		//descending
+		oldLeftCount = totalLeftCount = node->leftCount;
+		selfCount = node->selfCount;
+		totalRightCount -= selfCount + totalLeftCount;	
+		while(node->data != d)
+		{
+			if(node->data > d)
+			{
+				node->leftCount++;
+				if(node->left) 
+				{
+					node = node->left;
+					totalRightCount += selfCount + oldLeftCount - node->selfCount - node->leftCount;
+					totalLeftCount += node->leftCount - oldLeftCount;
+					selfCount = node->selfCount;
+					oldLeftCount = node->leftCount;
+				}
+				else {
+					node->createChild(d, this);
+					escaped = true;
+					break;
+				}				
+			}
+			else if(node->right)
+				 {
+					 node = node->right;
+					 totalRightCount -= node->selfCount + node->leftCount;
+					 totalLeftCount += selfCount + node->leftCount;
+					 selfCount = node->selfCount;
+					 oldLeftCount = node->leftCount;
+				 }
+				 else {
+					 node->createChild(d, this);
+					 escaped = true;
+					 break;
+				 }
+		}
+		if(!escaped)node->selfCount++;
+		//end of descending
 		escape_count = calculate_escape(t);
 		if(escaped) {
 			s->low_count = t->totalCount-1;
 			s->scale = s->high_count = s->low_count + escape_count;
 		}
 		else {
-			s->low_count = iter.totalLeftCount;
-			s->high_count = iter.totalLeftCount + iter.selfCount;
-			s->scale = iter.totalLeftCount + iter.selfCount + 
-						iter.totalRightCount + escape_count;
+			s->low_count = totalLeftCount;
+			s->high_count = totalLeftCount + selfCount;
+			s->scale = totalLeftCount + selfCount + 
+						totalRightCount + escape_count;
 		}
 	}
 	else {
@@ -142,6 +133,11 @@ bool get_symbol(BYTE d, SYMBOL* s)
 		s->scale = 1;
 	}
 	return (newTree || escaped);
+}
+
+bool get_symbol(BYTE b, SYMBOL *s)
+{
+	return t->encode(b, s);
 }
 
 void get_scale(SYMBOL* s)
@@ -163,14 +159,65 @@ short get_byte(long count, SYMBOL *s)
 	long selfCount;
 	long escape_count = 0;
 	Tree::Node* node;
-	Tree* tree;
-	tree = t;
+	Tree* tree = t;
+	BYTE d;
 	if(escaped)
 	{
 		s->low_count = count;
 		s->high_count = count + 1;
-		Tree::iterator iter(tree,(BYTE)count);
-		if(!newTree) iter[(BYTE)count];
+		d = (BYTE)count;
+		totalRightCount = tree->totalCount;
+		if(tree->rootNode) node = tree->rootNode;
+		else 
+		{
+			node = tree->rootNode = new Tree::Node(d);
+			newTree = true;
+			nodeAdded = true;
+			tree->numNodes++;
+		}
+		tree->totalCount++;
+		if(!newTree)
+		{
+			//descending
+			oldLeftCount = totalLeftCount = node->leftCount;
+			selfCount = node->selfCount;
+			totalRightCount -= selfCount + totalLeftCount;	
+			while(node->data != d)
+			{
+				if(node->data > d)
+				{
+					node->leftCount++;
+					if(node->left) 
+					{
+						node = node->left;
+						totalRightCount += selfCount + oldLeftCount - node->selfCount - node->leftCount;
+						totalLeftCount += node->leftCount - oldLeftCount;
+						selfCount = node->selfCount;
+						oldLeftCount = node->leftCount;
+					}
+					else {
+						node->createChild(d, tree);
+						escaped = true;
+						break;
+					}				
+				}
+				else if(node->right)
+					 {
+						 node = node->right;
+						 totalRightCount -= node->selfCount + node->leftCount;
+						 totalLeftCount += selfCount + node->leftCount;
+						 selfCount = node->selfCount;
+						 oldLeftCount = node->leftCount;
+					 }
+					 else {
+						 node->createChild(d, tree);
+						 escaped = true;
+						 break;
+					 }
+			}
+			if(!escaped)node->selfCount++;
+			//done descending
+		}
 		newTree = nodeAdded = escaped = false;
 		return count;
 	}

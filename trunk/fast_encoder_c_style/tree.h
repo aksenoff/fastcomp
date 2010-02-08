@@ -7,7 +7,6 @@ A tree holding probabilities for bytes encountered in input stream
 #include "encoder.h"
 typedef unsigned char BYTE;
 
-
 class Tree {
 public:
 	//interface declarations	 
@@ -16,6 +15,7 @@ public:
 	Tree(const BYTE);
 	Tree& operator=(const Tree&);
 	~Tree();
+	bool encode(BYTE, SYMBOL*);
 
 	class Node {
 	public:
@@ -32,29 +32,12 @@ public:
 		BYTE data;
 	};
 
-	class iterator {
-	public:
-		//interface declarations
-		iterator();
-		iterator(Tree*, const BYTE);
-		iterator(const iterator&);
-		~iterator();
-		void operator[](const BYTE);
-		Node *node;
-		Tree *tree;
-		long totalRightCount;
-		long totalLeftCount;
-		long oldLeftCount;
-		long selfCount;
-	};
-
 	Node *rootNode;
 	long totalCount; // total number of symbols encoded
 	short numNodes; // number of different symbols encoded
 };
 
 void initialize_model();
-
-bool get_symbol(BYTE d, SYMBOL* s);
+bool get_symbol(BYTE, SYMBOL *);
 
 #endif

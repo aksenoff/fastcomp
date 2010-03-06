@@ -162,7 +162,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\fast_encoder_c_style\bitio.cpp"
+				RelativePath="..\fast_encoder\bitio.cpp"
 				>
 			</File>
 			<File
@@ -174,7 +174,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\fast_encoder_c_style\tree.cpp"
+				RelativePath="..\fast_encoder\tree.cpp"
 				>
 			</File>
 		</Filter>

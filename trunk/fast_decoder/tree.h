@@ -26,8 +26,8 @@ public:
 		Node& operator=(const Node&);
 		~Node();
 		Node* createChild(const BYTE, Tree*);
-		long selfCount;
-		long leftCount;
+		unsigned long selfCount;
+		unsigned long leftCount;
 		Node *left, *right;
 		BYTE data;
 	};
@@ -42,15 +42,15 @@ public:
 		void operator[](const BYTE);
 		Node *node;
 		Tree *tree;
-		long totalRightCount;
-		long totalLeftCount;
-		long oldLeftCount;
-		long selfCount;
+		unsigned long totalRightCount;
+		unsigned long totalLeftCount;
+		unsigned long oldLeftCount;
+		unsigned long selfCount;
 	};
 
 	Node *rootNode;
-	long totalCount; // total number of symbols encoded
-	short numNodes; // number of different symbols encoded
+	unsigned long totalCount; // total number of symbols encoded
+	unsigned short numNodes; // number of different symbols encoded
 };
 
 void initialize_model();
@@ -59,6 +59,6 @@ bool get_symbol(BYTE, SYMBOL*);
 
 void get_scale(SYMBOL*);
 
-short get_byte(long, SYMBOL*);
+long get_byte(unsigned long, SYMBOL*);
 
 #endif

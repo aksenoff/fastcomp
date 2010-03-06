@@ -4,6 +4,9 @@
 #include<stdio.h>
 #define ESCAPE 256
 #define DONE -1
+#ifndef DBG
+#define DBG
+#endif
 
 typedef struct {
                 unsigned long int low_count;
@@ -18,6 +21,6 @@ extern long underflow_bits;    /* The present underflow count in  */
  */
 void initialize_arithmetic_decoder( FILE *stream );
 void remove_symbol_from_stream( FILE *stream, SYMBOL *s );
-long get_current_count( SYMBOL *s);
+unsigned long get_current_count( SYMBOL *s);
 
 #endif

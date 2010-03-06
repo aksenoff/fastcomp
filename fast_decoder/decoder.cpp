@@ -2,6 +2,8 @@
 #include "decoder.h"
 #include "bitio.h"
 
+extern FILE* log_file;
+
 static unsigned short int code;  /* The present input code value       */
 static unsigned short int low;   /* Start of the current code range    */
 static unsigned short int high;  /* End of the current code range      */
@@ -14,15 +16,18 @@ long underflow_bits;             /* Number of underflow bits pending   */
  *
  *  code = count / s->scale
  */
-long get_current_count( SYMBOL *s)
+unsigned long get_current_count( SYMBOL *s)
 {
-    long range;
-    short int count;
-
-    range = (long) ( high - low ) + 1;
-	count = (long int)
+    unsigned long range;
+    long count;
+	
+    range = (unsigned long) ( high - low ) + 1;
+	count = (long)
             ((((long) ( code - low ) + 1 ) * s->scale-1 ) / range );
-    return( count );
+#ifdef DBG
+		fprintf(log_file,"get_current_count: Current count is %d\n",count);
+#endif
+	return( count );
 }
 /*
  * This routine is called to initialize the state of the arithmetic
@@ -38,10 +43,13 @@ void initialize_arithmetic_decoder(FILE *stream )
     for ( i = 0 ; i < 16 ; i++ )
     {
         code <<= 1;
-        code += input_bit( stream );
+		code += input_bit( stream );
     }
     low = 0;
     high = 0xffff;
+#ifdef DBG
+		fprintf(log_file,"initialize_arithmetic_decoder: Current code is %d\n",code);
+#endif
 }
 
 /*
@@ -62,6 +70,9 @@ void remove_symbol_from_stream( FILE *stream, SYMBOL *s )
                  (( range * s->high_count ) / s->scale - 1 );
     low = low + (unsigned short int)
                  (( range * s->low_count ) / s->scale );
+#ifdef DBG
+		fprintf(log_file,"remove_symbol_from_stream: Low <- %d High <- %d\n",low,high);
+#endif
 /*
  * Next, any possible bits are shipped out.
  */
@@ -81,6 +92,9 @@ void remove_symbol_from_stream( FILE *stream, SYMBOL *s )
             code ^= 0x4000;
             low   &= 0x3fff;
             high  |= 0x4000;
+#ifdef DBG
+		fprintf(log_file,"remove_symbol_from_stream: Underflow suspected. Low <- %d High <- %d\n",low,high);
+#endif
         }
 /*
  * Otherwise, nothing can be shifted out, so I return.
@@ -90,8 +104,14 @@ void remove_symbol_from_stream( FILE *stream, SYMBOL *s )
         low <<= 1;
         high <<= 1;
         high |= 1;
+#ifdef DBG
+		fprintf(log_file,"remove_symbol_from_stream: Low and high are shifted left. Low: %d High: %d\n",low,high);
+#endif
         code <<= 1;
         code += input_bit( stream );
+#ifdef DBG
+		fprintf(log_file,"remove_symbol_from_stream: New bit is shifted into code. Code: %d\n",code);
+#endif
     }
 }
 

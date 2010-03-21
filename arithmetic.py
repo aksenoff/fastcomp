@@ -11,7 +11,7 @@ class BitOutputStream(object):
             self.stream.write(chr(self.byte))
             self.byte = 0
             self.mask = 128
-    def close(self):
+    def flush(self):
         self.stream.write(chr(self.byte))
         # self.stream.close()
 
@@ -46,7 +46,7 @@ class Encoder(object):
                 return
             low = (low << 1) & 0xffff
             high = ((high << 1) & 0xffff) | 1
-    def close(self):
+    def flush(self):
         write = self.bitstream.write
         write(self.low & 0x4000)
         self.underflow_bits += 1
@@ -54,7 +54,7 @@ class Encoder(object):
             write(~self.low & 0x4000)
             self.underflow_bits -= 1
         for i in range(16): write(False)
-        self.bitstream.close()
+        self.bitstream.flush()
 
 class BitInputStream(object):
     def __init__(self, stream):

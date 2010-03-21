@@ -21,7 +21,7 @@ class Encoder(object):
         self.low = 0
         self.high = 0xffff
         self.underflow_bits = 0
-    def encode(self, high_count, low_count, scale):
+    def encode(self, low_count, high_count, scale):
         high, low = self.high, self.low
         underflow_bits = self.underflow_bits
         write = self.bitstream.write
@@ -83,7 +83,7 @@ class Decoder(object):
         range = (high - low) + 1
         count = (((code - low) + 1)*scale - 1) / range
         return count
-    def remove(self, high_count, low_count, scale):
+    def remove(self, low_count, high_count, scale):
         high, low, code = self.high, self.low, self.code
         range = (high - low) + 1
         high = low + (range*high_count)/scale - 1
@@ -127,7 +127,7 @@ if __name__ == '__main__':
         encoder = Encoder(stream)
         for char in input:
             low_count, high_count = table[char]
-            encoder.encode(high_count, low_count, scale)
+            encoder.encode(low_count, high_count, scale)
         encoder.close()
         s = stream.getvalue()
         stream.seek(0)
@@ -137,7 +137,7 @@ if __name__ == '__main__':
             char2 = reverse_table[count]
             if char != char2: print 'ERROR', i, char, char2
             low_count, high_count = table[char]
-            decoder.remove(high_count, low_count, scale)
+            decoder.remove(low_count, high_count, scale)
         print 'PASSED'
     test()
 

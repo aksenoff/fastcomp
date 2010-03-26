@@ -17,8 +17,8 @@ int main()
 	log_file = fopen("log_unc.txt","wt");
 	setvbuf( text_file, NULL, _IOFBF, 4096 ); //??
 	SYMBOL s;
-	unsigned long count;
-	long byte;
+	unsigned short count;
+	short byte;
 	initialize_model();
     initialize_input_bitstream();
     initialize_arithmetic_decoder( compressed_file );

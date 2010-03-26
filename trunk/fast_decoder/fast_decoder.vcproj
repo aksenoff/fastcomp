@@ -191,10 +191,6 @@
 				RelativePath=".\decoder.h"
 				>
 			</File>
-			<File
-				RelativePath=".\tree.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Файлы ресурсов"

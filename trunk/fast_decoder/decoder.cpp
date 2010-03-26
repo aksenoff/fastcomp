@@ -16,14 +16,14 @@ long underflow_bits;             /* Number of underflow bits pending   */
  *
  *  code = count / s->scale
  */
-unsigned long get_current_count( SYMBOL *s)
+unsigned short get_current_count( SYMBOL *s)
 {
     unsigned long range;
-    long count;
+    unsigned short count;
 	
     range = (unsigned long) ( high - low ) + 1;
-	count = (long)
-            ((((long) ( code - low ) + 1 ) * s->scale-1 ) / range );
+	count = (unsigned short)
+            ((((unsigned short) ( code - low ) + 1 ) * s->scale-1 ) / range );
 #ifdef DBG
 		fprintf(log_file,"get_current_count: Current count is %d\n",count);
 #endif
@@ -60,15 +60,15 @@ void initialize_arithmetic_decoder(FILE *stream )
  */
 void remove_symbol_from_stream( FILE *stream, SYMBOL *s )
 {
-    long range;
+    unsigned long range;
 
 /*
  * First, the range is expanded to account for the symbol removal.
  */
-    range = (long)( high - low ) + 1;
-    high = low + (unsigned short int)
+    range = (unsigned long)( high - low ) + 1;
+    high = low + (unsigned short)
                  (( range * s->high_count ) / s->scale - 1 );
-    low = low + (unsigned short int)
+    low = low + (unsigned short)
                  (( range * s->low_count ) / s->scale );
 #ifdef DBG
 		fprintf(log_file,"remove_symbol_from_stream: Low <- %d High <- %d\n",low,high);

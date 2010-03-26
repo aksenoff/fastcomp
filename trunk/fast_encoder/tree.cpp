@@ -1,6 +1,6 @@
 #include "tree.h"
 extern FILE *log_file;
-bool newTree = false, escaped = false, nodeAdded = false;
+bool newTree = false, escaped = false, nodeAdded = false, rootModified = false;
 
 Tree::Tree(const BYTE d)
 	: totalCount(1), numNodes(1) {rootNode = new Node(d);}
@@ -32,15 +32,15 @@ void initialize_model()
 	t = new Tree;
 }
 
-long calculate_escape(Tree *t)
+unsigned short calculate_escape(Tree *t)
 {
-	short numNodes = t->numNodes-1;
+	unsigned short numNodes = t->numNodes-1;
 	if(nodeAdded) 
 	{
 		numNodes--;
 		nodeAdded = false;
 	}
-	return(((256 - numNodes) * numNodes) / (256 * t->rootNode->selfCount) + 1);
+	return(((256 - numNodes) * numNodes) / (256 * (t->rootNode->selfCount)) + 1);
 }
 
 void encode_in_null_table(BYTE d, SYMBOL* s)
@@ -53,7 +53,7 @@ void encode_in_null_table(BYTE d, SYMBOL* s)
 bool Tree::encode(short ds, SYMBOL* s)
 {
 	BYTE d = (BYTE)ds;
-	long escape_count = 0;
+	unsigned short escape_count = 0;
 	if(escaped || newTree)
 	{
 		newTree = escaped = false;
@@ -67,63 +67,43 @@ bool Tree::encode(short ds, SYMBOL* s)
 		return false;
 	}
 	Node *node;
-	long totalRightCount;
-	long totalLeftCount;
-	long oldLeftCount;
-	long selfCount;
-	totalRightCount = totalCount;
+	unsigned short totalRightCount;
+	unsigned short totalLeftCount;
+	unsigned short oldLeftCount;
+	unsigned short selfCount;
 	if(rootNode) node = rootNode;
 	else 
 	{
-#ifdef DBG
-		fprintf(log_file,"encode: Creating new tree with root node containing %d\n",d);
-#endif
 		node = rootNode = new Node(d); // that's why we need 3rd parameter
 		newTree = true;
 		nodeAdded = true;
 		numNodes++;
 	}
-	totalCount++;
+	if (t->totalCount == 0x3FFF) t->rescale();
+	totalRightCount = totalCount;
+	totalCount++;	
 #ifdef DBG
 		fprintf(log_file,"encode: Total count increased to %d\n",totalCount);
 #endif
 	if(!newTree) {
 		//descending
-#ifdef DBG
-		fprintf(log_file,"encode: Traversing the tree in search for %d\n",d);
-#endif
 		oldLeftCount = totalLeftCount = node->leftCount;
 		selfCount = node->selfCount;
 		totalRightCount -= selfCount + totalLeftCount;
-#ifdef DBG
-		fprintf(log_file,"encode: Currently %d is on the left, %d is on the right, and current node has %d\n",totalLeftCount,totalRightCount,selfCount);
-#endif
 		while(node->data != d)
 		{
-#ifdef DBG
-		fprintf(log_file,"encode: Current node has %d instead of %d\n",node->data,d);
-#endif
 			if(node->data > d)
 			{
 				node->leftCount++;
 				if(node->left) 
 				{
-#ifdef DBG
-		fprintf(log_file,"encode: Gone left\n");
-#endif
 					node = node->left;
 					totalRightCount += selfCount + oldLeftCount - node->selfCount - node->leftCount;
 					totalLeftCount += node->leftCount - oldLeftCount;
 					selfCount = node->selfCount;
 					oldLeftCount = node->leftCount;
-#ifdef DBG
-		fprintf(log_file,"encode: Currently %d is on the left, %d is on the right, and current node has %d\n",totalLeftCount,totalRightCount,selfCount);
-#endif
 				}
 				else {
-#ifdef DBG
-		fprintf(log_file,"encode: No left child. Creating one\n");
-#endif
 					node->createChild(d, this);
 					escaped = true;
 					break;
@@ -131,22 +111,13 @@ bool Tree::encode(short ds, SYMBOL* s)
 			}
 			else if(node->right)
 				 {
-#ifdef DBG
-		fprintf(log_file,"encode: Gone right\n");
-#endif
 					 node = node->right;
 					 totalRightCount -= node->selfCount + node->leftCount;
 					 totalLeftCount += selfCount + node->leftCount;
 					 selfCount = node->selfCount;
 					 oldLeftCount = node->leftCount;
-#ifdef DBG
-		fprintf(log_file,"encode: Currently %d is on the left, %d is on the right, and current node has %d\n",totalLeftCount,totalRightCount,selfCount);
-#endif
 				 }
 				 else {
-#ifdef DBG
-		fprintf(log_file,"encode: No right child. Creating one\n");
-#endif
 					 node->createChild(d, this);
 					 escaped = true;
 					 break;
@@ -157,7 +128,11 @@ bool Tree::encode(short ds, SYMBOL* s)
 #ifdef DBG
 		fprintf(log_file,"encode: Escape count calculated and equals %d\n",escape_count);
 #endif
-		if(!escaped)node->selfCount++;
+		if(!escaped)
+		{
+			node->selfCount++;
+			if(node==rootNode)rootModified = true;
+		}
 		if(escaped) {
 			s->low_count = t->totalCount-1;
 			s->scale = s->high_count = s->low_count + escape_count;
@@ -201,16 +176,16 @@ void get_scale(SYMBOL* s)
 			s->scale = t->totalCount + calculate_escape(t);
 		 else s->scale = 1;
 #ifdef DBG
-		fprintf(log_file,"get_scale: Scale counted and equals %d\n",s->scale);
+	fprintf(log_file,"get_scale: Scale counted and equals %d\n",s->scale);
 #endif
 }
 
-long get_byte(unsigned long count, SYMBOL *s)
+short get_byte(unsigned short count, SYMBOL *s)
 {
-	unsigned long totalRightCount;
-	unsigned long totalLeftCount;
-	unsigned long oldLeftCount;
-	unsigned long selfCount;
+	unsigned short totalRightCount;
+	unsigned short totalLeftCount;
+	unsigned short oldLeftCount;
+	unsigned short selfCount;
 	//unsigned long escape_count = 0;
 	Tree::Node* node;
 	Tree* tree = t;
@@ -223,60 +198,39 @@ long get_byte(unsigned long count, SYMBOL *s)
 #ifdef DBG
 		fprintf(log_file,"get_byte: We've escaped, but still need to update the tree with %d\n",d);
 #endif
-		totalRightCount = tree->totalCount;
 		if(tree->rootNode) node = tree->rootNode;
 		else 
 		{
-#ifdef DBG
-		fprintf(log_file,"get_byte: Creating new tree with %d in its root\n",d);
-#endif
 			node = tree->rootNode = new Tree::Node(d);
 			newTree = true;
 			nodeAdded = true;
 			tree->numNodes++;
 		}
-		tree->totalCount++;
+		totalRightCount = tree->totalCount;
+		tree->totalCount++;		
 #ifdef DBG
 		fprintf(log_file,"get_byte: Total count increased to %d\n",tree->totalCount);
 #endif
 		if(!newTree)
 		{
-#ifdef DBG
-		fprintf(log_file,"get_byte: Traversing the tree in search for %d\n",d);
-#endif
 			//descending
 			oldLeftCount = totalLeftCount = node->leftCount;
 			selfCount = node->selfCount;
 			totalRightCount -= selfCount + totalLeftCount;
-#ifdef DBG
-		fprintf(log_file,"get_byte: Currently %d is on the left, %d is on the right, and current node has %d\n",totalLeftCount,totalRightCount,selfCount);
-#endif
 			while(node->data != d)
 			{
-#ifdef DBG
-		fprintf(log_file,"get_byte: Current node has %d instead of %d\n",node->data,d);
-#endif
 				if(node->data > d)
 				{
 					node->leftCount++;
 					if(node->left) 
 					{
-#ifdef DBG
-		fprintf(log_file,"get_byte: Gone left\n");
-#endif
 						node = node->left;
 						totalRightCount += selfCount + oldLeftCount - node->selfCount - node->leftCount;
 						totalLeftCount += node->leftCount - oldLeftCount;
 						selfCount = node->selfCount;
 						oldLeftCount = node->leftCount;
-#ifdef DBG
-		fprintf(log_file,"get_byte: Currently %d is on the left, %d is on the right, and current node has %d\n",totalLeftCount,totalRightCount,selfCount);
-#endif
 					}
 					else {
-#ifdef DBG
-		fprintf(log_file,"get_byte: No left child. Creating one\n");
-#endif
 						node->createChild(d, tree);
 						escaped = true;
 						break;
@@ -284,22 +238,13 @@ long get_byte(unsigned long count, SYMBOL *s)
 				}
 				else if(node->right)
 					 {
-#ifdef DBG
-		fprintf(log_file,"get_byte: Gone right\n");
-#endif
 						 node = node->right;
 						 totalRightCount -= node->selfCount + node->leftCount;
 						 totalLeftCount += selfCount + node->leftCount;
 						 selfCount = node->selfCount;
 						 oldLeftCount = node->leftCount;
-#ifdef DBG
-		fprintf(log_file,"get_byte: Currently %d is on the left, %d is on the right, and current node has %d\n",totalLeftCount,totalRightCount,selfCount);
-#endif
 					 }
 					 else {
-#ifdef DBG
-		fprintf(log_file,"get_byte: No right child. Creating one\n");
-#endif
 						 node->createChild(d, tree);
 						 escaped = true;
 						 break;
@@ -309,6 +254,7 @@ long get_byte(unsigned long count, SYMBOL *s)
 			//done descending
 		}
 		newTree = nodeAdded = escaped = false;
+		if (tree->totalCount == 0x3FFF) tree->rescale();
 		return count;
 	}
 	if(!(tree->rootNode))
@@ -316,9 +262,6 @@ long get_byte(unsigned long count, SYMBOL *s)
 		s->low_count = 0;
 		s->high_count = 1;
 		escaped = true;
-#ifdef DBG
-		fprintf(log_file,"get_byte: No tree. Escaping with 0:1/1\n");
-#endif
 		return ESCAPE;
 	}
 	else if(count >= tree->totalCount)
@@ -336,50 +279,36 @@ long get_byte(unsigned long count, SYMBOL *s)
 #ifdef DBG
 		fprintf(log_file,"get_byte: Tree has byte, but we need to find it. Target count is %d\n", count);
 #endif
-		totalRightCount = tree->totalCount;
 		node = tree->rootNode;
 		tree->totalCount++;
+		totalRightCount = tree->totalCount;
 #ifdef DBG
 		fprintf(log_file,"get_byte: Total count increased to %d\n",tree->totalCount);
 #endif
 		oldLeftCount = totalLeftCount = node->leftCount;
 		selfCount = node->selfCount;
 		totalRightCount -= selfCount + totalLeftCount;
-#ifdef DBG
-		fprintf(log_file,"get_byte: Currently %d is on the left, %d is on the right, and current node has %d\n",totalLeftCount,totalRightCount,selfCount);
-#endif
 		while(!((totalLeftCount <= count) && ((totalLeftCount+selfCount) > count)))
 		{
 			if(totalLeftCount > count)
 			{
 				node->leftCount++;
-#ifdef DBG
-		fprintf(log_file,"get_byte: We have to move left\n");
-#endif
 				node = node->left;
 				totalRightCount += selfCount + oldLeftCount - node->selfCount - node->leftCount;
 				totalLeftCount += node->leftCount - oldLeftCount;
 				selfCount = node->selfCount;
 				oldLeftCount = node->leftCount;
-#ifdef DBG
-		fprintf(log_file,"get_byte: Currently %d is on the left, %d is on the right, and current node has %d\n",totalLeftCount,totalRightCount,selfCount);
-#endif				
 			}
 			else {
-#ifdef DBG
-		fprintf(log_file,"get_byte: We have to move right\n");
-#endif
 				 node = node->right;
 				 totalRightCount -= node->selfCount + node->leftCount;
 				 totalLeftCount += selfCount + node->leftCount;
 				 selfCount = node->selfCount;
 				 oldLeftCount = node->leftCount;
-#ifdef DBG
-		fprintf(log_file,"get_byte: Currently %d is on the left, %d is on the right, and current node has %d\n",totalLeftCount,totalRightCount,selfCount);
-#endif
 		     }
 		}
 		node->selfCount++;
+		if (tree->totalCount == 0x3FFF) tree->rescale();
 #ifdef DBG
 		fprintf(log_file,"get_byte: Target byte is %d\n",node->data);
 #endif
@@ -390,4 +319,23 @@ long get_byte(unsigned long count, SYMBOL *s)
 #endif
 		return node->data;
 	}
+}
+
+void Tree::rescale()
+{
+	totalCount = rootNode->rescale();
+}
+
+unsigned short Tree::Node::rescale()
+{
+#ifdef DBG
+		fprintf(log_file,"Rescaling\n");
+#endif
+	unsigned short tempRightCount = 0;
+	if(selfCount != 1) selfCount >>= 1;
+	if(left)
+		leftCount = left->rescale();
+	if(right)
+		tempRightCount = right->rescale();
+	return (selfCount + leftCount + tempRightCount);
 }

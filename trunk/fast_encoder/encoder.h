@@ -8,9 +8,9 @@
 #define DBG
 #endif
 typedef struct {
-                unsigned long int low_count;
-                unsigned long int high_count;
-                unsigned long int scale;
+                unsigned short low_count;
+                unsigned short high_count;
+                unsigned short scale;
                } SYMBOL;
 
 extern long underflow_bits;

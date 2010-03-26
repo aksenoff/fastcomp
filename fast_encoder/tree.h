@@ -16,6 +16,7 @@ public:
 	Tree& operator=(const Tree&);
 	~Tree();
 	bool encode(short, SYMBOL*);
+	void rescale();
 
 	class Node {
 	public:
@@ -26,15 +27,16 @@ public:
 		Node& operator=(const Node&);
 		~Node();
 		Node* createChild(const BYTE, Tree*);
-		long selfCount;
-		long leftCount;
+		unsigned short rescale();
+		unsigned short selfCount;
+		unsigned short leftCount;
 		Node *left, *right;
 		BYTE data;
 	};
 
 	Node *rootNode;
-	long totalCount; // total number of symbols encoded
-	short numNodes; // number of different symbols encoded
+	unsigned short totalCount; // total number of symbols encoded
+	unsigned short numNodes; // number of different symbols encoded
 };
 
 void initialize_model();

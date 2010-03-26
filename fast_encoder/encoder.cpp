@@ -4,9 +4,9 @@
 
 using namespace std;
 
-static unsigned short int code; 
-static unsigned short int low; 
-static unsigned short int high;
+static unsigned short code; 
+static unsigned short low; 
+static unsigned short high;
 long underflow_bits; 
 extern FILE *log_file;
 

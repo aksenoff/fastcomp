@@ -9,9 +9,9 @@
 #endif
 
 typedef struct {
-                unsigned long int low_count;
-                unsigned long int high_count;
-                unsigned long int scale;
+                unsigned short low_count;
+                unsigned short high_count;
+                unsigned short scale;
                } SYMBOL;
 
 extern long underflow_bits;    /* The present underflow count in  */
@@ -21,6 +21,6 @@ extern long underflow_bits;    /* The present underflow count in  */
  */
 void initialize_arithmetic_decoder( FILE *stream );
 void remove_symbol_from_stream( FILE *stream, SYMBOL *s );
-unsigned long get_current_count( SYMBOL *s);
+unsigned short get_current_count( SYMBOL *s);
 
 #endif

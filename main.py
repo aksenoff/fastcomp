@@ -12,26 +12,26 @@ def encode(input, output):
         encoder.encode(low_count, high_count, scale)
     encoder.flush()
 
-def decode(input, output):
+def decode(input, output, size):
     model = Model()
     decoder = Decoder(input)
-    while True:
+    for i in xrange(size):
         scale = model.get_scale()
         code = decoder.decode(scale)
         char, low_count, high_count, scale2 = model.decode(code)
         assert scale == scale2
         decoder.remove(low_count, high_count, scale)
         output.write(char)
-        if char == 'x': break
 
 def main():
-    data = 'ababac' * 1000 + 'x'
+    data = 'ababac' * 10000
     input = cStringIO.StringIO(data)
     output = cStringIO.StringIO()
     encode(input, output)
+    print 'COMPRESS LENGTH:', len(output.getvalue())
     output.seek(0)
     result = cStringIO.StringIO()
-    decode(output, result)
+    decode(output, result, len(data))
     if result.getvalue() == data: print 'PASSED'
     else: print 'ERROR'
 

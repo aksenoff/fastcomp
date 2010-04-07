@@ -1,7 +1,7 @@
 #include <cstdio>
-#include "tree.h"
+#include "..\model\tree.h"
 #include "decoder.h"
-#include "bitio.h"
+#include "..\bitio\bitio.h"
 #include <cstdlib>
 #include <cstring>
 

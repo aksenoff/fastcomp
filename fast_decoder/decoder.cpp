@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "decoder.h"
-#include "bitio.h"
+#include "..\bitio\bitio.h"
 
 extern FILE* log_file;
 

@@ -162,7 +162,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\fast_encoder\bitio.cpp"
+				RelativePath="..\bitio\bitio.cpp"
 				>
 			</File>
 			<File
@@ -174,7 +174,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\fast_encoder\tree.cpp"
+				RelativePath="..\model\tree.cpp"
 				>
 			</File>
 		</Filter>
@@ -184,11 +184,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\bitio.h"
+				RelativePath="..\bitio\bitio.h"
 				>
 			</File>
 			<File
 				RelativePath=".\decoder.h"
+				>
+			</File>
+			<File
+				RelativePath="..\model\tree.h"
 				>
 			</File>
 		</Filter>

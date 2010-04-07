@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "encoder.h"
+#include "..\fast_encoder\encoder.h"
 #include "bitio.h"
 
 #define BUFFER_SIZE 256

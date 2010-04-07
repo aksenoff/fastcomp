@@ -8,11 +8,14 @@
 #define DBG
 #endif
 
+#ifndef SYMBOL_STRUCTURE
+#define SYMBOL_STRUCTURE
 typedef struct {
                 unsigned short low_count;
                 unsigned short high_count;
                 unsigned short scale;
                } SYMBOL;
+#endif
 
 extern long underflow_bits;    /* The present underflow count in  */
                                /* the arithmetic coder.           */

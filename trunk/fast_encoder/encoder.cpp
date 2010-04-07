@@ -1,6 +1,6 @@
 #include <cstdio>
 #include "encoder.h"
-#include "bitio.h"
+#include "..\bitio\bitio.h"
 
 using namespace std;
 

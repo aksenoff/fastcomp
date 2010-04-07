@@ -4,7 +4,7 @@
 A tree holding probabilities for bytes encountered in input stream
 
 */
-#include "encoder.h"
+#include "..\fast_encoder\encoder.h"
 typedef unsigned char BYTE;
 
 class Tree {
@@ -41,5 +41,7 @@ public:
 
 void initialize_model();
 bool get_symbol(short, SYMBOL *);
+void get_scale(SYMBOL*);
+short get_byte(unsigned short, SYMBOL *);
 
 #endif

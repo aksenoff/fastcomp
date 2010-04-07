@@ -188,6 +188,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common_arith\common_arith.h"
+				>
+			</File>
+			<File
 				RelativePath=".\encoder.h"
 				>
 			</File>

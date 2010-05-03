@@ -34,15 +34,20 @@ def decode(input, output):
     # print tostr(model.root)
 
 def main():
-    data = 'ababac' * 1000
-    input = cStringIO.StringIO(data)
-    output = cStringIO.StringIO()
+    input = file('input.txt', 'rb')
+    output = file('output.sqz', 'wb')
     encode(input, output)
     # print '----------'
-    output.seek(0)
-    result = cStringIO.StringIO()
+    output.close()
+    output = file('output.sqz', 'rb')
+    result = file('result.txt', 'wb')
     decode(output, result)
-    if result.getvalue() == data: print 'PASSED'
+    input.seek(0)
+    s1 = input.read()
+    result.close()
+    result = file('result.txt', 'rb')
+    s2 = result.read()
+    if s1  == s2: print 'PASSED'
     else: print 'ERROR'
 
 if __name__ == '__main__': main()

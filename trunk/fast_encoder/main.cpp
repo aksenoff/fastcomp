@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 		d = getc(text_file);
 		do { 
 #ifdef DBG
-		fprintf(log_file,"main: Compressing %d\n",d);
+		fprintf(log_file,"main: Cmp %d\n",d);
 #endif
 			escaped = get_symbol(d, &s);
 			encode_symbol(compressed_file, &s);

@@ -58,11 +58,11 @@ bool Tree::encode(short ds, SYMBOL* s)
 	{
 		newTree = escaped = false;
 #ifdef DBG
-		fprintf(log_file,"encode: Encoding %d in null table\n",d);
+		fprintf(log_file,"enc: Enc %d in nt\n",d);
 #endif
 		encode_in_null_table(d, s);
 #ifdef DBG
-		fprintf(log_file,"encode: %d encoded as %d:%d/%d\n",d, s->low_count,s->high_count,s->scale);
+		fprintf(log_file,"enc: %d %d:%d/%d\n",d, s->low_count,s->high_count,s->scale);
 #endif
 		return false;
 	}
@@ -83,7 +83,7 @@ bool Tree::encode(short ds, SYMBOL* s)
 	totalRightCount = totalCount;
 	totalCount++;	
 #ifdef DBG
-		fprintf(log_file,"encode: Total count increased to %d\n",totalCount);
+		fprintf(log_file,"enc: Total %d\n",totalCount);
 #endif
 	if(!newTree) {
 		//descending
@@ -126,7 +126,7 @@ bool Tree::encode(short ds, SYMBOL* s)
 		//end of descending
 		escape_count = calculate_escape(t);
 #ifdef DBG
-		fprintf(log_file,"encode: Escape count calculated and equals %d\n",escape_count);
+		fprintf(log_file,"enc: Esc %d\n",escape_count);
 #endif
 		if(!escaped)
 		{
@@ -137,7 +137,7 @@ bool Tree::encode(short ds, SYMBOL* s)
 			s->low_count = t->totalCount-1;
 			s->scale = s->high_count = s->low_count + escape_count;
 #ifdef DBG
-		fprintf(log_file,"encode: %d encoded as %d:%d/%d\n",d, s->low_count,s->high_count,s->scale);
+		fprintf(log_file,"enc: %d %d:%d/%d\n",d, s->low_count,s->high_count,s->scale);
 #endif
 		}
 		else {
@@ -146,7 +146,7 @@ bool Tree::encode(short ds, SYMBOL* s)
 			s->scale = totalLeftCount + selfCount + 
 						totalRightCount + escape_count;
 #ifdef DBG
-		fprintf(log_file,"encode: %d encoded as %d:%d/%d\n",d, s->low_count,s->high_count,s->scale);
+		fprintf(log_file,"enc: %d %d:%d/%d\n",d, s->low_count,s->high_count,s->scale);
 #endif
 		}
 	}
@@ -155,7 +155,7 @@ bool Tree::encode(short ds, SYMBOL* s)
 		s->high_count = 1;
 		s->scale = 1;
 #ifdef DBG
-		fprintf(log_file,"encode: %d encoded as %d:%d/%d\n",d, s->low_count,s->high_count,s->scale);
+		fprintf(log_file,"enc: %d %d:%d/%d\n",d, s->low_count,s->high_count,s->scale);
 #endif
 	}
 	return (newTree || escaped);
@@ -176,7 +176,7 @@ void get_scale(SYMBOL* s)
 			s->scale = t->totalCount + calculate_escape(t);
 		 else s->scale = 1;
 #ifdef DBG
-	fprintf(log_file,"get_scale: Scale counted and equals %d\n",s->scale);
+	fprintf(log_file,"get_sc: Scale %d\n",s->scale);
 #endif
 }
 
@@ -196,7 +196,7 @@ short get_byte(unsigned short count, SYMBOL *s)
 		s->high_count = count + 1;
 		d = (BYTE)count;
 #ifdef DBG
-		fprintf(log_file,"get_byte: We've escaped, but still need to update the tree with %d\n",d);
+		fprintf(log_file,"get_b: Tree<-%d\n",d);
 #endif
 		if(tree->rootNode) node = tree->rootNode;
 		else 
@@ -209,7 +209,7 @@ short get_byte(unsigned short count, SYMBOL *s)
 		totalRightCount = tree->totalCount;
 		tree->totalCount++;		
 #ifdef DBG
-		fprintf(log_file,"get_byte: Total count increased to %d\n",tree->totalCount);
+		fprintf(log_file,"get_b: Total %d\n",tree->totalCount);
 #endif
 		if(!newTree)
 		{
@@ -270,20 +270,20 @@ short get_byte(unsigned short count, SYMBOL *s)
 		s->scale = s->high_count = s->low_count + calculate_escape(t);
 		escaped = true;
 #ifdef DBG
-		fprintf(log_file,"get_byte: Byte not present in tree. Escaping with %d:%d/%d\n",s->low_count,s->high_count,s->scale);
+		fprintf(log_file,"get_b: Esc %d:%d/%d\n",s->low_count,s->high_count,s->scale);
 #endif
 		return ESCAPE;
 	}
 	else
 	{
 #ifdef DBG
-		fprintf(log_file,"get_byte: Tree has byte, but we need to find it. Target count is %d\n", count);
+		fprintf(log_file,"get_b: srch for %d\n", count);
 #endif
 		node = tree->rootNode;
 		tree->totalCount++;
 		totalRightCount = tree->totalCount;
 #ifdef DBG
-		fprintf(log_file,"get_byte: Total count increased to %d\n",tree->totalCount);
+		fprintf(log_file,"get_b: Total %d\n",tree->totalCount);
 #endif
 		oldLeftCount = totalLeftCount = node->leftCount;
 		selfCount = node->selfCount;
@@ -310,12 +310,12 @@ short get_byte(unsigned short count, SYMBOL *s)
 		node->selfCount++;
 		if (tree->totalCount == 0x3FFF) tree->rescale();
 #ifdef DBG
-		fprintf(log_file,"get_byte: Target byte is %d\n",node->data);
+		fprintf(log_file,"get_byte: byte %d\n",node->data);
 #endif
 		s->low_count = totalLeftCount;
 		s->high_count = totalLeftCount + selfCount;
 #ifdef DBG
-		fprintf(log_file,"get_byte: s is %d:%d/%d\n",s->low_count,s->high_count,s->scale);
+		fprintf(log_file,"get_byte: s %d:%d/%d\n",s->low_count,s->high_count,s->scale);
 #endif
 		return node->data;
 	}

@@ -25,7 +25,7 @@ unsigned short get_current_count( SYMBOL *s)
 	count = (unsigned short)
             ((((unsigned short) ( code - low ) + 1 ) * s->scale-1 ) / range );
 #ifdef DBG
-		fprintf(log_file,"get_current_count: Current count is %d\n",count);
+		fprintf(log_file,"get_cur_cnt: cnt %d\n",count);
 #endif
 	return( count );
 }
@@ -48,7 +48,7 @@ void initialize_arithmetic_decoder(FILE *stream )
     low = 0;
     high = 0xffff;
 #ifdef DBG
-		fprintf(log_file,"initialize_arithmetic_decoder: Current code is %d\n",code);
+		fprintf(log_file,"init_a_d: code %d\n",code);
 #endif
 }
 
@@ -71,7 +71,7 @@ void remove_symbol_from_stream( FILE *stream, SYMBOL *s )
     low = low + (unsigned short)
                  (( range * s->low_count ) / s->scale );
 #ifdef DBG
-		fprintf(log_file,"remove_symbol_from_stream: Low <- %d High <- %d\n",low,high);
+		fprintf(log_file,"rm_s_fr_str: L %d H %d\n",low,high);
 #endif
 /*
  * Next, any possible bits are shipped out.
@@ -93,7 +93,7 @@ void remove_symbol_from_stream( FILE *stream, SYMBOL *s )
             low   &= 0x3fff;
             high  |= 0x4000;
 #ifdef DBG
-		fprintf(log_file,"remove_symbol_from_stream: Underflow suspected. Low <- %d High <- %d\n",low,high);
+		fprintf(log_file,"rm_s_fr_str: Uflow? L %d H %d\n",low,high);
 #endif
         }
 /*
@@ -105,12 +105,12 @@ void remove_symbol_from_stream( FILE *stream, SYMBOL *s )
         high <<= 1;
         high |= 1;
 #ifdef DBG
-		fprintf(log_file,"remove_symbol_from_stream: Low and high are shifted left. Low: %d High: %d\n",low,high);
+		fprintf(log_file,"rm_s_fr_str: SHL L %d H %d\n",low,high);
 #endif
         code <<= 1;
         code += input_bit( stream );
 #ifdef DBG
-		fprintf(log_file,"remove_symbol_from_stream: New bit is shifted into code. Code: %d\n",code);
+		fprintf(log_file,"rm_s_fr_str: Code %d\n",code);
 #endif
     }
 }

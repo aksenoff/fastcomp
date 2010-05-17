@@ -35,7 +35,7 @@ int main()
 		if(byte==DONE)
 			break;
 #ifdef DBG
-		fprintf(log_file,"main: Writing %d\n",byte);
+		fprintf(log_file,"main: Wr %d\n",byte);
 #endif
 		putc( (BYTE) byte, text_file );
 	}

@@ -1,5 +1,6 @@
 
 EOF = -1
+MAX_WEIGHT = 2**14-1
 
 class BasicModel(object):
     @staticmethod
@@ -33,8 +34,15 @@ def tostr(node, level=1):
     else: rightstr = tostr(node.right, level+1)
     return '(%d:%s %d:%s:%d %s:%d)' % (node.left_weight, leftstr, level, node.char, node.weight, rightstr, node.right_weight)
 
+def rescale(node):
+    if node.left is not None:
+        node.left_weight = rescale(node.left)
+    if node.right is not None:
+        node.right_weight = rescale(node.right)
+    node.weight = (node.weight+1)//2
+    return node.weight + node.left_weight + node.right_weight
+
 def balance(parent, attr, char):
-    root = parent.root #
     node = getattr(parent, attr)
     while True:
         if char == node.char: return
@@ -46,7 +54,6 @@ def balance(parent, attr, char):
             right_weight2 = child.right_weight + node.weight + node.right_weight
             diff2 = abs(left_weight2 - right_weight2)
             if diff2 < diff:
-                # print 'PRE1', tostr(root)
                 node.left_weight, child.right_weight = \
                     child.right_weight, child.right_weight + node.weight + node.right_weight
                 node.left = child.right
@@ -72,7 +79,6 @@ def balance(parent, attr, char):
             left_weight2 = child.left_weight + node.weight + node.left_weight
             diff2 = abs(left_weight2 - right_weight2)
             if diff2 < diff:
-                # print 'PRE2', tostr(root)
                 node.right_weight, child.left_weight = \
                     child.left_weight, node.left_weight + node.weight + child.left_weight
                 node.right = child.left
@@ -92,44 +98,53 @@ def balance(parent, attr, char):
                 attr = 'right'
                 node = child
 
-def process_char(node, char): # -> node, low_count
+def process_char(parent, attr, char): # -> node, low_count
+    node = getattr(parent, attr)
+    tree_weight = node.weight + node.left_weight + node.right_weight
+    if tree_weight == MAX_WEIGHT: rescale(node)
     low_count = 0
-    while True:
-        if char == node.char:
-            node.weight += 1
-            return node, low_count + node.left_weight
-        elif char < node.char:
+    while char <> node.char:
+        if char < node.char:
             node.left_weight += 1
             if node.left is None:
                 node.left = Node(char)
-                return node.left, low_count + node.left_weight
-            else:
                 node = node.left
+            else: node = node.left
         else:
             node.right_weight += 1
+            low_count += node.left_weight + node.weight
             if node.right is None:
                 node.right = Node(char)
-                return node.right, low_count + node.left_weight + node.weight
-            else:
-                low_count += node.left_weight + node.weight
                 node = node.right
+            else: node = node.right
+    node.weight += 1
+    low_count += node.left_weight
+    balance(parent, attr, char)
+    return node, low_count
 
-def process_code(node, code): # -> node, low_count
+def process_code(parent, attr, code): # -> node, low_count
+    node = getattr(parent, attr)
+    tree_weight = node.weight + node.left_weight + node.right_weight
+    if tree_weight == MAX_WEIGHT: rescale(node)
     low_count = 0
     while True:
+        assert node is not None
         a = low_count + node.left_weight
         b = a + node.weight
         if code < a:
             node.left_weight += 1
             node = node.left
-        elif code >= b:
-            low_count = a + node.weight
-            node.right_weight += 1
-            node = node.right
         else:
-            node.weight += 1
-            return node, low_count + node.left_weight
-        assert node is not None
+            b = a + node.weight
+            if code >= b:
+                low_count = b
+                node.right_weight += 1
+                node = node.right
+            else: break
+    node.weight += 1
+    low_count += node.left_weight
+    balance(parent, attr, char)
+    return node, low_count
             
 class Model(object):
     def __init__(self):
@@ -148,8 +163,8 @@ class Model(object):
             self.root = node = Node(char)
             low_count = 0
         else:
-            node, low_count = process_char(self.root, char)
-            balance(self, 'root', char)
+            node, low_count = process_char(self, 'root', char)
+            
         root = self.root
         # print tostr(root)
         tree_weight = root.left_weight + root.weight + root.right_weight
@@ -176,9 +191,7 @@ class Model(object):
             self.escaped = False
             char, low_count, high_count, scale = basic_model.decode(code)
             if self.root is None: self.root = Node(char)
-            else:
-                process_char(self.root, char)
-                balance(self, 'root', char)
+            else: process_char(self, 'root', char)
             self.size += 1
             # print tostr(self.root), self.size
             return char, low_count, high_count, scale
@@ -192,8 +205,7 @@ class Model(object):
             assert code < scale
             self.escaped = True
             return None, tree_weight, scale, scale
-        node, low_count = process_code(root, code)
-        balance(self, 'root', node.char)
+        node, low_count = process_code(self, 'root', code)
         high_count = low_count + node.weight - 1
         return node.char, low_count, high_count, scale
     

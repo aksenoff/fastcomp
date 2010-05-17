@@ -26,7 +26,6 @@ public:
 		Node(const BYTE);
 		Node& operator=(const Node&);
 		~Node();
-		Node* createChild(const BYTE, Tree*);
 		unsigned short rescale();
 		unsigned short selfCount;
 		unsigned short leftCount;
@@ -38,6 +37,8 @@ public:
 	unsigned short totalCount; // total number of symbols encoded
 	unsigned short numNodes; // number of different symbols encoded
 };
+
+class model;
 
 void initialize_model();
 bool get_symbol(short, SYMBOL *);

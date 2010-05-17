@@ -17,13 +17,6 @@ Tree::Node::Node(const BYTE d)
 	: selfCount(1), leftCount(0), data(d), left(0), right(0) {};
 Tree::Node& Tree::Node::operator=(const Node&) {return *this;}; //!
 Tree::Node::~Node() {};
-Tree::Node* Tree::Node::createChild(const BYTE d, Tree *tree)
-{
-	tree->numNodes++; //! в другом месте
-	nodeAdded = true;
-	if(data > d) return (left = new Tree::Node(d));
-	else return (right = new Tree::Node(d));
-};
 
 Tree *t;
 
@@ -104,8 +97,9 @@ bool Tree::encode(short ds, SYMBOL* s)
 					oldLeftCount = node->leftCount;
 				}
 				else {
-					node->createChild(d, this);
-					escaped = true;
+					node->left = new Tree::Node(d);
+					this->numNodes++;
+					nodeAdded = escaped = true;
 					break;
 				}				
 			}
@@ -118,8 +112,9 @@ bool Tree::encode(short ds, SYMBOL* s)
 					 oldLeftCount = node->leftCount;
 				 }
 				 else {
-					 node->createChild(d, this);
-					 escaped = true;
+					 node->right = new Tree::Node(d);
+					 this->numNodes++;
+					 nodeAdded = escaped = true;
 					 break;
 				 }
 		}
@@ -132,19 +127,17 @@ bool Tree::encode(short ds, SYMBOL* s)
 		{
 			node->selfCount++;
 			if(node==rootNode)rootModified = true;
-		}
-		if(escaped) {
-			s->low_count = t->totalCount-1;
-			s->scale = s->high_count = s->low_count + escape_count;
-#ifdef DBG
-		fprintf(log_file,"enc: %d %d:%d/%d\n",d, s->low_count,s->high_count,s->scale);
-#endif
-		}
-		else {
 			s->low_count = totalLeftCount;
 			s->high_count = totalLeftCount + selfCount;
 			s->scale = totalLeftCount + selfCount + 
 						totalRightCount + escape_count;
+#ifdef DBG
+		fprintf(log_file,"enc: %d %d:%d/%d\n",d, s->low_count,s->high_count,s->scale);
+#endif
+		}
+		else{
+			s->low_count = t->totalCount-1;
+			s->scale = s->high_count = s->low_count + escape_count;
 #ifdef DBG
 		fprintf(log_file,"enc: %d %d:%d/%d\n",d, s->low_count,s->high_count,s->scale);
 #endif
@@ -231,9 +224,10 @@ short get_byte(unsigned short count, SYMBOL *s)
 						oldLeftCount = node->leftCount;
 					}
 					else {
-						node->createChild(d, tree);
-						escaped = true;
-						break;
+					    node->left = new Tree::Node(d);
+					    tree->numNodes++;
+					    nodeAdded = escaped = true;
+					    break;
 					}				
 				}
 				else if(node->right)
@@ -245,9 +239,10 @@ short get_byte(unsigned short count, SYMBOL *s)
 						 oldLeftCount = node->leftCount;
 					 }
 					 else {
-						 node->createChild(d, tree);
-						 escaped = true;
-						 break;
+						 node->right = new Tree::Node(d);
+					     tree->numNodes++;
+						 nodeAdded = escaped = true;
+					     break;
 					 }
 			}
 			if(!escaped)node->selfCount++;

@@ -1,14 +1,11 @@
-#include <cstdio>
-#include "..\model\tree.h"
-#include "decoder.h"
+#include "..\model\model.h"
 #include "..\bitio\bitio.h"
-#include <cstdlib>
-#include <cstring>
+#include "decoder.h"
 
-using namespace std;
 FILE *log_file;
+Model model;
 
-int main()
+int main(int argc, char** argv)
 {
 	FILE *text_file;
     FILE *compressed_file;
@@ -19,15 +16,14 @@ int main()
 	SYMBOL s;
 	unsigned short count;
 	short byte;
-	initialize_model();
     initialize_input_bitstream();
     initialize_arithmetic_decoder( compressed_file );
 	while(1)
 	{
 		do { 
-			get_scale(&s); // найти кол-во символов вместе с эскейпами
+			model.get_scale(&s); // symbols defined + num of escapes
 			count = get_current_count(&s);
-			byte = get_byte(count, &s);
+			byte = model.get_byte(count, &s);
 			remove_symbol_from_stream( compressed_file, &s );
 			if(byte==DONE)
 				break;

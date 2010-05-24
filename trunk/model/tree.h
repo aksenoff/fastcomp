@@ -4,28 +4,21 @@
 A tree holding probabilities for bytes encountered in input stream
 
 */
-#include "..\fast_encoder\encoder.h"
-typedef unsigned char BYTE;
+#include "..\common_arith\common_arith.h"
 
 class Tree {
-public:
-	//interface declarations	 
+public: 
 	Tree();
-	Tree(const Tree&);
-	Tree(const BYTE);
-	Tree& operator=(const Tree&);
-	~Tree();
-	bool encode(short, SYMBOL*);
+	bool encode(BYTE, SYMBOL*);
 	void rescale();
+	void get_scale(SYMBOL*);
+    short decode(unsigned short, SYMBOL*);
+	void insert(unsigned short);
+	unsigned short calculate_escape();
 
 	class Node {
 	public:
-		//interface declarations
-		Node();
-		Node(const Node &n);
 		Node(const BYTE);
-		Node& operator=(const Node&);
-		~Node();
 		unsigned short rescale();
 		unsigned short selfCount;
 		unsigned short leftCount;
@@ -37,12 +30,5 @@ public:
 	unsigned short totalCount; // total number of symbols encoded
 	unsigned short numNodes; // number of different symbols encoded
 };
-
-class model;
-
-void initialize_model();
-bool get_symbol(short, SYMBOL *);
-void get_scale(SYMBOL*);
-short get_byte(unsigned short, SYMBOL *);
 
 #endif

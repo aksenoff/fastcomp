@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 #ifdef DBG
 		fprintf(log_file,"main: Cmp %d\n",d);
 #endif
-			model.escaped = model.get_symbol(d, &s);
+			model.get_symbol(d, &s);
 			encode_symbol(compressed_file, &s);
 			if(d==DONE) break;
 		} while(model.escaped);

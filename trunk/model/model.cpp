@@ -19,7 +19,7 @@ void Model::encode_in_null_table(BYTE d, SYMBOL* s)
 
 //-----------------------------------
 
-bool Model::get_symbol(short ds, SYMBOL *s)
+void Model::get_symbol(short ds, SYMBOL *s)
 {
 	BYTE d = (BYTE)ds;
 	if(escaped)
@@ -32,9 +32,8 @@ bool Model::get_symbol(short ds, SYMBOL *s)
 #ifdef DBG
 		fprintf(log_file,"enc: %d %d:%d/%d\n",d, s->low_count,s->high_count,s->scale);
 #endif
-		return false;
 	}
-	return t->encode(d, s);
+	else t->encode(d, s);
 }
 
 //------------------------------------

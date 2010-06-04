@@ -6,7 +6,8 @@
 class Model {
 public:
 	Tree *t;
-	bool escaped, newTree, nodeAdded, rootModified;
+	Tree *currentContext;
+	bool escaped, newTree, nodeAdded;
 	Model();
 	void get_symbol(short, SYMBOL*);
 	void get_scale(SYMBOL*);

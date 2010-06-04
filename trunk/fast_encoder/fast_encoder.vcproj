@@ -162,57 +162,75 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\bitio\bitio.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\encoder.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\main.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\model\model.cpp"
+			<Filter
+				Name="model"
 				>
-			</File>
-			<File
-				RelativePath="..\model\tree.cpp"
+				<File
+					RelativePath="..\model\context_tree.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\model\model.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\model\tree.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="arithmetic"
 				>
-			</File>
+				<File
+					RelativePath="..\bitio\bitio.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\encoder.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Заголовочные файлы"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\bitio\bitio.h"
+			<Filter
+				Name="model"
 				>
-			</File>
-			<File
-				RelativePath="..\common_arith\common_arith.h"
+				<File
+					RelativePath="..\model\context_tree.h"
+					>
+				</File>
+				<File
+					RelativePath="..\model\model.h"
+					>
+				</File>
+				<File
+					RelativePath="..\model\tree.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="arithmetic"
 				>
-			</File>
-			<File
-				RelativePath=".\encoder.h"
-				>
-			</File>
-			<File
-				RelativePath="..\model\model.h"
-				>
-			</File>
-			<File
-				RelativePath="..\model\tree.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Файлы ресурсов"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
+				<File
+					RelativePath="..\bitio\bitio.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common_arith\common_arith.h"
+					>
+				</File>
+				<File
+					RelativePath=".\encoder.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

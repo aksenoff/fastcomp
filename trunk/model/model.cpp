@@ -6,7 +6,7 @@ extern FILE *log_file;
 //Model member functions definitions:
 
 Model::Model()
-    : t(new Tree), newTree(false), escaped(false), nodeAdded(false), rootModified(false) {};
+    : t(new Tree), newTree(false), escaped(false), nodeAdded(false) {};
 
 //-----------------------------------
 

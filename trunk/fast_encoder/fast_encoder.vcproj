@@ -57,6 +57,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -169,7 +170,15 @@
 				Name="model"
 				>
 				<File
+					RelativePath="..\model\context.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\model\model.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\model\node.cpp"
 					>
 				</File>
 				<File
@@ -178,6 +187,10 @@
 				</File>
 				<File
 					RelativePath="..\model\tree.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\model\zero_context.cpp"
 					>
 				</File>
 			</Filter>
@@ -203,7 +216,15 @@
 				Name="model"
 				>
 				<File
+					RelativePath="..\model\context.h"
+					>
+				</File>
+				<File
 					RelativePath="..\model\model.h"
+					>
+				</File>
+				<File
+					RelativePath="..\model\node.h"
 					>
 				</File>
 				<File
@@ -212,6 +233,10 @@
 				</File>
 				<File
 					RelativePath="..\model\tree.h"
+					>
+				</File>
+				<File
+					RelativePath="..\model\zero_context.h"
 					>
 				</File>
 			</Filter>

@@ -6,7 +6,7 @@ extern FILE *log_file;
 //Model member functions definitions:
 
 Model::Model()
-    : t(new Tree), newTree(false), escaped(false), nodeAdded(false) {};
+    : zc(new ZeroContext), newTree(false), escaped(false), nodeAdded(false) {};
 
 //-----------------------------------
 
@@ -21,7 +21,7 @@ void Model::encode_in_null_table(BYTE d, SYMBOL* s)
 
 void Model::get_symbol(short ds, SYMBOL *s)
 {
-	BYTE d = (BYTE)ds;
+	/*BYTE d = (BYTE)ds;
 	if(escaped)
 	{
 		newTree = escaped = false;
@@ -33,7 +33,39 @@ void Model::get_symbol(short ds, SYMBOL *s)
 		fprintf(log_file,"enc: %d %d:%d/%d\n",d, s->low_count,s->high_count,s->scale);
 #endif
 	}
-	else t->encode(d, s);
+	else t->encode(d, s);*/
+	BYTE d = BYTE(ds);
+	if(escaped)
+	{
+		newTree = escaped = false;
+		if(currentContext == 0) 
+		{
+			encode_in_null_table(d, s);
+			return;
+		}
+		else
+		{
+			currentContext = currentContext->suff;
+			currentContext->probTree->encode(d, s);
+		}
+	}
+	else 
+	{
+		if(currentContext == 0) zc->probTree->encode(d, s);
+		else currentContext->probTree->encode(d, s);
+	}
+	if(!escaped) //can't merge with previous else 'cos encode() may change escaped
+	{
+		// we successfully encoded not in -1st context
+		if(node->next) currentContext = node->next;
+		else
+		{
+			ctxt = node->prev->next;
+			currentContext = ctxt->prefix->addPrefix(d); // not implemented!
+			currentContext->suff = ctxt;
+			node->next = currentContext;
+		}
+	}
 }
 
 //------------------------------------

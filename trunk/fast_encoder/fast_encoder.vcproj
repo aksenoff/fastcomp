@@ -169,11 +169,11 @@
 				Name="model"
 				>
 				<File
-					RelativePath="..\model\context_tree.cpp"
+					RelativePath="..\model\model.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\model\model.cpp"
+					RelativePath="..\model\prefix_tree.cpp"
 					>
 				</File>
 				<File
@@ -203,11 +203,11 @@
 				Name="model"
 				>
 				<File
-					RelativePath="..\model\context_tree.h"
+					RelativePath="..\model\model.h"
 					>
 				</File>
 				<File
-					RelativePath="..\model\model.h"
+					RelativePath="..\model\prefix_tree.h"
 					>
 				</File>
 				<File

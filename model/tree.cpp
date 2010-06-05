@@ -1,8 +1,4 @@
 #include "tree.h"
-#include "model.h"
-
-extern FILE *log_file;
-extern Model model;
 
 //=====================================
 //Tree member functions definitions:
@@ -25,7 +21,7 @@ unsigned short Tree::calculate_escape()
 
 //--------------------------------------
 
-bool Tree::encode(BYTE d, SYMBOL* s)
+void Tree::encode(BYTE d, SYMBOL* s)
 {
 	if(!rootNode) 
 	{
@@ -90,6 +86,7 @@ bool Tree::encode(BYTE d, SYMBOL* s)
 				 }
 		}
 		//end of descending
+		model.node = node;
 		escape_count = calculate_escape();
 #ifdef DBG
 		fprintf(log_file,"enc: Esc %d\n",escape_count);
@@ -115,7 +112,6 @@ bool Tree::encode(BYTE d, SYMBOL* s)
 #endif
 		}
 	}
-	return model.escaped;
 }
 
 //----------------------------------------
@@ -275,19 +271,3 @@ void Tree::rescale()
 	totalCount = rootNode->rescale();
 }
 
-//=====================================
-//Tree::Node member functions definitions:
-
-Tree::Node::Node(const BYTE d)
-	: selfCount(1), leftCount(0), data(d), left(0), right(0) {};
-
-//---------------------------------------
-
-unsigned short Tree::Node::rescale()
-{
-	unsigned short tempRightCount = 0;
-	if(selfCount != 1) selfCount >>= 1;
-	if(left) leftCount = left->rescale();
-	if(right) tempRightCount = right->rescale();
-	return (selfCount + leftCount + tempRightCount);
-}

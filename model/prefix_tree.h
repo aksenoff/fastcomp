@@ -10,7 +10,8 @@ class PrefixTree {
 public:
 	PrefixTree();
 	Context *rootNode;
-	unsigned short totalCount;
+	//unsigned short totalCount;
+	Context* addPrefix(BYTE);
 };
 
 #endif

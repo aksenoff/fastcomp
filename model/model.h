@@ -22,7 +22,7 @@ public:
 	void get_symbol(short, SYMBOL*);
 	void get_scale(SYMBOL*);
     short get_byte(unsigned short, SYMBOL*);
-	static void encode_in_null_table(BYTE d, SYMBOL* s);
+	void encode_in_null_table(short, SYMBOL*);
 	Context *ctxt;
 	Node *node;
 	ZeroContext *zc;

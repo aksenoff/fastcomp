@@ -9,6 +9,7 @@ class PrefixTree;
 
 class ZeroContext {
 public:
+	ZeroContext();
 	Tree *probTree;
 	PrefixTree *prefix;
 };

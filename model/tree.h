@@ -17,7 +17,7 @@ extern Model model;
 class Tree {
 public: 
 	Tree();
-	void encode(BYTE, SYMBOL*);
+	void encode(short, SYMBOL*);
 	void rescale();
 	void get_scale(SYMBOL*);
     short decode(unsigned short, SYMBOL*);

@@ -10,11 +10,12 @@ Model::Model()
 
 //-----------------------------------
 
-void Model::encode_in_null_table(BYTE d, SYMBOL* s)
+void Model::encode_in_null_table(short ds, SYMBOL* s)
 {
-	s->low_count = d;
-	s->high_count = d + 1;
-	s->scale = 256;
+	if(ds == -1) ds = 256;
+	s->low_count = ds;
+	s->high_count = ds + 1;
+	s->scale = 257;
 }
 
 //-----------------------------------
@@ -34,29 +35,30 @@ void Model::get_symbol(short ds, SYMBOL *s)
 #endif
 	}
 	else t->encode(d, s);*/
-	BYTE d = BYTE(ds);
+	//BYTE d = BYTE(ds);
 	if(escaped)
 	{
 		newTree = escaped = false;
 		if(currentContext == 0) 
 		{
-			encode_in_null_table(d, s);
+			encode_in_null_table(ds, s);
 			return;
 		}
 		else
 		{
 			currentContext = currentContext->suff;
-			currentContext->probTree->encode(d, s);
+			currentContext->probTree->encode(ds, s);
 		}
 	}
 	else 
 	{
-		if(currentContext == 0) zc->probTree->encode(d, s);
-		else currentContext->probTree->encode(d, s);
+		if(currentContext == 0) zc->probTree->encode(ds, s);
+		else currentContext->probTree->encode(ds, s);
 	}
 	if(!escaped) //can't merge with previous else 'cos encode() may change escaped
 	{
 		// we successfully encoded not in -1st context
+		BYTE d = (BYTE)ds;
 		if(node->next) currentContext = node->next;
 		else
 		{
@@ -83,11 +85,11 @@ void Model::get_scale(SYMBOL* s)
 
 short Model::get_byte(unsigned short count, SYMBOL *s)
 {
-	if(!escaped) return t->decode(count, s);
+	/*if(!escaped) return t->decode(count, s);
 	escaped = false;
 	s->low_count = count;
 	s->high_count = count + 1;
 	t->insert(count);
-	return count;
+	return count;*/
 }
 

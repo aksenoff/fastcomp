@@ -10,13 +10,10 @@ class Tree;
 class Context {
 public:
 	Context(const BYTE);
-	unsigned short rescale();
-	unsigned short selfCount;
-	unsigned short leftCount;
 	Context *left, *right;
 	BYTE data;
 	Tree *probTree;
-	PrefixTree *prefix;
+	PrefixTree *prefix;//?
 	Context *suff;
 };
 

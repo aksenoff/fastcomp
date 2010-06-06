@@ -21,11 +21,19 @@ unsigned short Tree::calculate_escape()
 
 //--------------------------------------
 
-void Tree::encode(BYTE d, SYMBOL* s)
+void Tree::encode(short ds, SYMBOL* s)
 {
+	if (ds == -1) // we have eof here :)
+	{
+		model.escaped = true;
+		s->low_count = totalCount;
+		s->scale = s->high_count = s->low_count + calculate_escape();
+		return;
+	}
+	BYTE d = (BYTE)ds;
 	if(!rootNode) 
 	{
-		rootNode = new Node(d); // that's why we need 3rd parameter
+		rootNode = new Node(d);
 		model.escaped = true;
 		numNodes++;
 		totalCount++;
@@ -250,12 +258,12 @@ short Tree::decode(unsigned short count, SYMBOL *s)
 		node->selfCount++;
 		if (totalCount == 0x3FFF) rescale();
 #ifdef DBG
-		fprintf(log_file,"get_byte: byte %d\n",node->data);
+		fprintf(log_file,"get_b: byte %d\n",node->data);
 #endif
 		s->low_count = totalLeftCount;
 		s->high_count = totalLeftCount + selfCount;
 #ifdef DBG
-		fprintf(log_file,"get_byte: s %d:%d/%d\n",s->low_count,s->high_count,s->scale);
+		fprintf(log_file,"get_b: s %d:%d/%d\n",s->low_count,s->high_count,s->scale);
 #endif
 		return node->data;
 	}

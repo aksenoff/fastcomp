@@ -4,7 +4,7 @@
 //Tree::Node member functions definitions:
 
 Node::Node(const BYTE d)
-	: selfCount(1), leftCount(0), data(d), left(0), right(0) {};
+	: selfCount(1), leftCount(0), data(d), left(0), right(0), next(0), prev(0) {};
 
 //---------------------------------------
 

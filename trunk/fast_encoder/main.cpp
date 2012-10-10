@@ -14,23 +14,26 @@ int main(int argc, char** argv)
 	text_file = fopen( "test.inp", "rb" );
     compressed_file = fopen( "test.cmp", "wb" );
 	log_file = fopen("log_c.txt","wt");
-	setvbuf( text_file, NULL, _IOFBF, 4096 );
+	//setvbuf( text_file, NULL, _IOFBF, 4096 );
 	SYMBOL s;
 	short d;
-	while(1)
+	do
 	{
 		d = getc(text_file);
-		do { 
+        ++model.numsymbols;
 #ifdef DBG
 		fprintf(log_file,"main: Cmp %d\n",d);
 #endif
+        do { 
 			model.get_symbol(d, &s);
 			encode_symbol(compressed_file, &s);
-			if(d==DONE) break;
 		} while(model.escaped);
-		if(d==DONE) 
-			break;
+#ifdef DBG
+        std::fflush(log_file);
+        std::fflush(compressed_file);
+#endif
 	}
+    while(d != DONE);
 	flush_arithmetic_encoder( compressed_file );
     flush_output_bitstream( compressed_file );
 	return 0;

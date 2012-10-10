@@ -1,9 +1,9 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual C++ Express 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fast_encoder", "fast_encoder\fast_encoder.vcproj", "{F054C128-A00C-457B-8A16-85A952D97E20}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fast_encoder", "fast_encoder\fast_encoder.vcxproj", "{F054C128-A00C-457B-8A16-85A952D97E20}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fast_decoder", "fast_decoder\fast_decoder.vcproj", "{25978E81-7D2D-4D56-95D8-D3016B456FEA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fast_decoder", "fast_decoder\fast_decoder.vcxproj", "{25978E81-7D2D-4D56-95D8-D3016B456FEA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

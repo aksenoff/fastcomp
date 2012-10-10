@@ -14,7 +14,7 @@ unsigned short Tree::calculate_escape()
 	if(model.nodeAdded) 
 	{
 		nN--;
-		model.nodeAdded = false;
+		//model.nodeAdded = false;
 	}
 	return(((256 - nN) * nN) / (256 * (rootNode->selfCount)) + 1);
 }
@@ -23,27 +23,30 @@ unsigned short Tree::calculate_escape()
 
 void Tree::encode(short ds, SYMBOL* s)
 {
-	if (ds == -1) // we have eof here :)
+	if (ds == DONE) // we have eof here :)
 	{
 		model.escaped = true;
 		s->low_count = totalCount;
 		s->scale = s->high_count = s->low_count + calculate_escape();
 		return;
 	}
-	BYTE d = (BYTE)ds;
+	BYTE d = static_cast<BYTE>(ds);
 	if(!rootNode) 
 	{
 		rootNode = new Node(d);
-		model.escaped = true;
 		numNodes++;
 		totalCount++;
 		s->low_count = 0;
 		s->high_count = 1;
 		s->scale = 1;
+        if(model.escaped) model.node->prev = rootNode;
+        model.node = rootNode;
+		model.nodeAdded = model.escaped =  true;
 	}
 	else 
 	{
-		Node *node = rootNode;
+        model.nodeAdded = false;
+        Node *node = rootNode;
 		unsigned short escape_count = 0, totalRightCount = 0, 
 			totalLeftCount = 0, oldLeftCount = 0, selfCount = 0;
 		if (totalCount == 0x3FFF) rescale();
@@ -73,7 +76,8 @@ void Tree::encode(short ds, SYMBOL* s)
 				{
 					node->left = new Node(d);
 					numNodes++;
-					model.nodeAdded = model.escaped = true;
+                    node = node->left;
+					model.nodeAdded = true;
 					break;
 				}				
 			}
@@ -89,18 +93,21 @@ void Tree::encode(short ds, SYMBOL* s)
 				 {
 					 node->right = new Node(d);
 					 numNodes++;
-					 model.nodeAdded = model.escaped = true;
+                     node = node->right;
+					 model.nodeAdded = true;
 					 break;
 				 }
 		}
 		//end of descending
-		model.node = node;
+        if(model.escaped) model.node->prev = node;  // we fellback from a higher order context
+        model.node = node;
 		escape_count = calculate_escape();
 #ifdef DBG
 		fprintf(log_file,"enc: Esc %d\n",escape_count);
 #endif
-		if(!model.escaped)
+		if(!model.nodeAdded)
 		{
+            model.escaped = false;
 			node->selfCount++;  //'cause if escape happened this is done in Node::Node(BYTE)
 			//if(node==rootNode) model.rootModified = true;
 			s->low_count = totalLeftCount;
@@ -113,7 +120,8 @@ void Tree::encode(short ds, SYMBOL* s)
 		}
 		else
 		{
-			s->low_count = totalCount-1;
+			model.escaped = true;
+            s->low_count = totalCount-1;
 			s->scale = s->high_count = s->low_count + escape_count;
 #ifdef DBG
 		fprintf(log_file,"enc: %d %d:%d/%d\n",d, s->low_count,s->high_count,s->scale);

@@ -23,9 +23,11 @@ public:
 	void get_scale(SYMBOL*);
     short get_byte(unsigned short, SYMBOL*);
 	void encode_in_null_table(short, SYMBOL*);
-	Context *ctxt;
+	Context *ctxt; 
 	Node *node;
+    unsigned short order;
 	ZeroContext *zc;
+    long numsymbols; // TODO: delete (for dbg only)
 };
 
 #endif

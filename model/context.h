@@ -13,7 +13,7 @@ public:
 	Context *left, *right;
 	BYTE data;
 	Tree *probTree;
-	PrefixTree *prefix;//?
+	PrefixTree *prefix;
 	Context *suff;
 };
 

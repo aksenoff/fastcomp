@@ -66,11 +66,23 @@ void Model::get_symbol(short ds, SYMBOL *s)
             }
             else
             {
-                ctxt = currentContext;
-                currentContext = node->prev->next;
-                ctxt = currentContext->prefix->addPrefix(ctxt->data);
-			    ctxt->suff = currentContext;
-			    node->next = ctxt;
+                Node *tempNode = node;
+                while(tempNode->prev)
+                {
+                    if(tempNode->prev->next)
+                    {
+                        ctxt = currentContext;
+                        currentContext = tempNode->prev->next;
+                        ctxt = currentContext->prefix->addPrefix(ctxt->data);
+			            ctxt->suff = currentContext;
+			            node->next = ctxt;
+                        break;
+                    }
+                    else
+                    {
+                        tempNode = tempNode->prev;
+                    }
+                }
             }
 		}
     }

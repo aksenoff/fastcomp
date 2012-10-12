@@ -25,7 +25,7 @@ void encode_symbol( FILE *stream, SYMBOL *s )
                  (( range * s->high_count ) / s->scale - 1 );
     low = low + (unsigned short)
                  (( range * s->low_count ) / s->scale );
-#ifdef DBG
+#ifdef DBG_ENC
 	fprintf(log_file,"enc_s: L %d H %d\n",low,high);
 #endif
     for ( ; ; )
@@ -33,13 +33,13 @@ void encode_symbol( FILE *stream, SYMBOL *s )
         if ( ( high & 0x8000 ) == ( low & 0x8000 ) )
         {
             output_bit( stream, high & 0x8000 );
-#ifdef DBG
+#ifdef DBG_ENC
 		fprintf(log_file,"enc_s: Shifting out %d\n",high>>15);
 #endif
             while ( underflow_bits > 0 )
             {
                 output_bit( stream, ~high & 0x8000 );
-#ifdef DBG
+#ifdef DBG_ENC
 		fprintf(log_file,"enc_s: Shifting out u.f. %d\n",(~high & 0x8000)>>15);
 #endif
                 underflow_bits--;
@@ -50,7 +50,7 @@ void encode_symbol( FILE *stream, SYMBOL *s )
             underflow_bits += 1;
             low &= 0x3fff;
             high |= 0x4000;
-#ifdef DBG
+#ifdef DBG_ENC
 		fprintf(log_file,"enc_s: Uflow? L %d H %d\n",low,high);
 #endif
         }
@@ -59,7 +59,7 @@ void encode_symbol( FILE *stream, SYMBOL *s )
         low <<= 1;
         high <<= 1;
         high |= 1;
-#ifdef DBG
+#ifdef DBG_ENC
 		fprintf(log_file,"enc_s: SHL L %d H %d\n",low,high);
 #endif
     }
@@ -68,13 +68,13 @@ void encode_symbol( FILE *stream, SYMBOL *s )
 void flush_arithmetic_encoder( FILE *stream )
 {
     output_bit( stream, low & 0x4000 );
-#ifdef DBG
+#ifdef DBG_ENC
 		fprintf(log_file,"flush_a_e: Shifting out %d\n", low & 0x4000>>14);
 #endif
     underflow_bits++;
     while ( underflow_bits-- > 0 )
 	{
-#ifdef DBG
+#ifdef DBG_ENC
 		fprintf(log_file,"flush_a_e: Shifting out u.f. %d\n",~low & 0x4000 >>14);
 #endif
         output_bit( stream, ~low & 0x4000 );

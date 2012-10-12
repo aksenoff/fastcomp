@@ -21,14 +21,14 @@ int main(int argc, char** argv)
 	{
 		d = getc(text_file);
         ++model.numsymbols;
-#ifdef DBG
+#ifdef DBG_MAIN
 		fprintf(log_file,"main: Cmp %d\n",d);
 #endif
         do { 
 			model.get_symbol(d, &s);
 			encode_symbol(compressed_file, &s);
 		} while(model.escaped);
-#ifdef DBG
+#ifdef DBG_MAIN
         std::fflush(log_file);
         std::fflush(compressed_file);
 #endif

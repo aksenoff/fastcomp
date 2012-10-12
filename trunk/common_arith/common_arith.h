@@ -6,8 +6,11 @@
 #define ESCAPE 256
 #define DONE -1
 
-#ifndef DBG
-#define DBG
+#ifndef DBG_MAIN
+//#define DBG_MAIN
+#endif
+#ifndef DBG_MODEL
+//#define DBG_MODEL
 #endif
 
 using namespace std;

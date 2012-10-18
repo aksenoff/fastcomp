@@ -27,13 +27,13 @@ void Model::get_symbol(short ds, SYMBOL *s)
 	if(escaped)
 	{
 #ifdef DBG_MODEL
-		fprintf(log_file, "get_s: Esc from ord %d\n", order);
+		fprintf(log_file, "Esc from ord %d\n", order);
 #endif
 		//newTree = escaped = false;
 		if(order == 0) 
 		{
 #ifdef DBG_MODEL
-		fprintf(log_file, "get_s: Enc in nt\n");
+		fprintf(log_file, "Enc in nt\n");
 #endif
 			encode_in_null_table(ds, s);
 			return;
@@ -41,7 +41,7 @@ void Model::get_symbol(short ds, SYMBOL *s)
 		else if(order == 1)
         {
 #ifdef DBG_MODEL
-		fprintf(log_file, "get_s: Enc in 0 ctxt\n");
+		fprintf(log_file, "Enc in 0 ctxt\n");
 #endif
             zc->probTree->encode(ds, s);
             order = 0;
@@ -49,7 +49,7 @@ void Model::get_symbol(short ds, SYMBOL *s)
         else
 		{
 #ifdef DBG_MODEL
-		fprintf(log_file, "get_s: Enc in suffix (ord %d)\n", order-1);
+		fprintf(log_file, "Enc in suffix (ord %d)\n", order-1);
 #endif
 			currentContext = currentContext->suff;
 			currentContext->probTree->encode(ds, s);
@@ -59,7 +59,7 @@ void Model::get_symbol(short ds, SYMBOL *s)
 	else 
 	{
 #ifdef DBG_MODEL
-		fprintf(log_file, "get_s: Trying to encode, ord %d\n", order);
+		fprintf(log_file, "%d)Trying to enc %c, ord %d\n", model.numsymbols, static_cast<unsigned char>(ds), order);
 #endif
 		if(order == 0) zc->probTree->encode(ds, s);
 		else currentContext->probTree->encode(ds, s);
@@ -67,7 +67,7 @@ void Model::get_symbol(short ds, SYMBOL *s)
 	if(!escaped) //can't merge with previous else 'cos encode() may change escaped
 	{
 #ifdef DBG_MODEL
-		fprintf(log_file, "get_s: Success, shifting\n");
+		fprintf(log_file, "Success, shifting\n");
 #endif
 		// we successfully encoded
 		BYTE d = static_cast<BYTE>(ds);
@@ -76,7 +76,7 @@ void Model::get_symbol(short ds, SYMBOL *s)
             currentContext = node->next;
             ++order;
 #ifdef DBG_MODEL
-		fprintf(log_file, "get_s: Goin to ord %d by next\n", order);
+		fprintf(log_file, "Goin to ord %d by next\n", order);
 #endif
         }
 		else // we encounter symbol in this context for the 2nd time
@@ -88,7 +88,7 @@ void Model::get_symbol(short ds, SYMBOL *s)
             else
             {*/
 #ifdef DBG_MODEL
-		fprintf(log_file, "get_s: No next ptr\n");
+		fprintf(log_file, "No next ptr\n");
 #endif
                 //Node *tempNode = node;
                 while(node->prev)
@@ -96,7 +96,7 @@ void Model::get_symbol(short ds, SYMBOL *s)
                     if(node->prev->next)
                     {
 #ifdef DBG_MODEL
-		fprintf(log_file, "get_s: Goin prev->next\n");
+		fprintf(log_file, "Goin prev->next\n");
 #endif
                         ctxt = currentContext;
                         currentContext = node->prev->next;
@@ -108,16 +108,17 @@ void Model::get_symbol(short ds, SYMBOL *s)
                     else
                     {
 #ifdef DBG_MODEL
-		fprintf(log_file, "get_s: Down to ord %d\n", order);
+		fprintf(log_file, "Down to ord %d\n", order);
 #endif
                         node = node->prev;
+                        currentContext = currentContext->suff;
                         --order;
                     }
                 }
                 if(order == 0)
                 {
 #ifdef DBG_MODEL
-		fprintf(log_file, "get_s: Reached 0\n");
+		fprintf(log_file, "Reached 0\n");
 #endif
                     node->next = zc->prefix->addPrefix(d);
                 }

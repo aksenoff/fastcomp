@@ -6,7 +6,7 @@ extern FILE *log_file;
 //Model member functions definitions:
 
 Model::Model()
-    : zc(new ZeroContext), newTree(false), escaped(false), nodeAdded(false), node(0), numsymbols(0) {};
+    : zc(new ZeroContext), newTree(false), escaped(false), nodeAdded(false), node(0), numsymbols(0), currentContext(0) {};
 
 //-----------------------------------
 
